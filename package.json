@@ -1,0 +1,20 @@
+{
+  "name" : "notify"
+  , "version" : "v0.1.0"
+  , "description" : "Native Node.js C++ extension for displaying desktop notifications using GNOME's libnotify library."
+  , "homepage" : "https://github.com/olalonde/node-notify"
+  , "author" : { 
+      "name" : "Olivier Lalonde"
+      , "email" : "olalonde@gmail.com"
+      , "url" : "http://www.syskall.com/"
+    }
+  , "repository" : { 
+      "type" : "git"
+      , "url" : "https://github.com/olalonde/node-notify.git"
+    }
+  , "scripts" : {
+      "preinstall" : "node-waf configure && node-waf build"
+      , "preuninstall" : "rm -rf build/*"
+    }
+  , "main" : "build/default/gtknotify.node"
+}
