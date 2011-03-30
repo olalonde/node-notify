@@ -4,6 +4,7 @@
 #include <v8.h>
 #include <node.h>
 // We need those two libraries for the GTK+ notification 
+#include <string>
 #include <gtkmm.h>
 #include <libnotifymm.h>
 
@@ -49,6 +50,14 @@ class Gtknotify : node::ObjectWrap {
     Gtknotify() {}
     ~Gtknotify() {}
     
+    // Notification title
+    std::string title;
+    // Notification icon
+    // 1) icon file path
+    // 2) a 'stock' icon name. see /usr/share/icons
+    // i.e. "terminal" or "chrome"
+    std::string icon; 
+    
     // Holds our constructor function
     static v8::Persistent<FunctionTemplate> persistent_function_template;
 
@@ -70,7 +79,11 @@ class Gtknotify : node::ObjectWrap {
       // Each JavaScript object keeps a reference to the C++ object for which it is a wrapper with an internal field.
       Gtknotify::persistent_function_template->InstanceTemplate()->SetInternalFieldCount(1); // 1 since this is a constructor function
       // Set a class name for objects created with our constructor
-      Gtknotify::persistent_function_template->SetClassName(v8::String::NewSymbol("Notification")); 
+      Gtknotify::persistent_function_template->SetClassName(v8::String::NewSymbol("Notification"));
+      
+      // Set property accessors
+      Gtknotify::persistent_function_template->InstanceTemplate()->SetAccessor(String::New("title"), GetTitle, SetTitle);
+      Gtknotify::persistent_function_template->InstanceTemplate()->SetAccessor(String::New("icon"), GetIcon, SetIcon);
       
       // @Node.js macro to help bind C++ methods to Javascript methods (see https://github.com/joyent/node/blob/v0.2.0/src/node.h#L34)
       // Arguments: our constructor function, Javascript method na,e, C++ method name
@@ -85,8 +98,13 @@ class Gtknotify : node::ObjectWrap {
     static Handle<Value> New(const Arguments& args) {
       HandleScope scope;
       Gtknotify* gtknotify_instance = new Gtknotify();
+      // Set some default values
+      gtknotify_instance->title = "Node.js";
+      gtknotify_instance->icon = "terminal";
+      
       // Wrap our C++ object as a Javascript object
       gtknotify_instance->Wrap(args.This());
+      
       
       // Our constructor function returns a Javascript object which is a wrapper for our C++ object, 
       // This is the expected behavior when calling a constructor function with the new operator in Javascript.
@@ -106,11 +124,36 @@ class Gtknotify : node::ObjectWrap {
       // see http://library.gnome.org/devel/libnotify/0.7/NotifyNotification.html 
       Notify::init("Basic");
       // Args: title, content, icon
-      Notify::Notification n("Alert", *v8str, "terminal"); // *v8str points to the C string
+      Notify::Notification n(gtknotify_instance->title.c_str(), *v8str, gtknotify_instance->icon.c_str()); // *v8str points to the C string
       // Display notification
       n.show();
       // Return value
       return v8::Boolean::New(true);
+    }
+    
+    // notification.title
+    static v8::Handle<Value> GetTitle(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+      // Extract the C++ request object from the JavaScript wrapper.
+      Gtknotify* gtknotify_instance = node::ObjectWrap::Unwrap<Gtknotify>(info.Holder());
+      return v8::String::New(gtknotify_instance->title.c_str());
+    }
+    // notification.title=
+    static void SetTitle(Local<String> property, Local<Value> value, const AccessorInfo& info) {
+      Gtknotify* gtknotify_instance = node::ObjectWrap::Unwrap<Gtknotify>(info.Holder());
+      v8::String::Utf8Value v8str(value);
+      gtknotify_instance->title = *v8str;
+    }
+    // notification.icon
+    static v8::Handle<Value> GetIcon(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
+      // Extract the C++ request object from the JavaScript wrapper.
+      Gtknotify* gtknotify_instance = node::ObjectWrap::Unwrap<Gtknotify>(info.Holder());
+      return v8::String::New(gtknotify_instance->icon.c_str());
+    }
+    // notification.icon=
+    static void SetIcon(Local<String> property, Local<Value> value, const AccessorInfo& info) {
+      Gtknotify* gtknotify_instance = node::ObjectWrap::Unwrap<Gtknotify>(info.Holder());
+      v8::String::Utf8Value v8str(value);
+      gtknotify_instance->icon = *v8str;
     }
 };
 
@@ -119,7 +162,7 @@ class Gtknotify : node::ObjectWrap {
 /* Thats it for actual interfacing with v8, finally we need to let Node.js know how to dynamically load our code. 
    Because a Node.js extension can be loaded at runtime from a shared object, we need a symbol that the dlsym function can find, 
    so we do the following: */
-// See http://www.freebsd.org/cgi/man.cgi?query=dlsym
+// See https://www.cloudkick.com/blog/2010/aug/23/writing-nodejs-native-extensions/ & http://www.freebsd.org/cgi/man.cgi?query=dlsym
 // Cause of name mangling in C++, we use extern C here
 v8::Persistent<FunctionTemplate> Gtknotify::persistent_function_template;
 extern "C" {
