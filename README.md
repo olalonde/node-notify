@@ -4,6 +4,12 @@ Part 1 (building a V8 extension) available here: [http://syskall.com/how-to-roll
 
 ## Install ##
 
+Using npm:
+
+    npm install notify
+    
+Manually:
+
     node-waf configure && node-waf build
 
 ## References ##
