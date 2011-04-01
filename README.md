@@ -12,6 +12,14 @@ Manually:
 
     node-waf configure && node-waf build
 
+## Usage ##
+
+    var notify = require("notify"); // or "../build/default/gtknotify.node" if you build manually
+    var notification = new notify.notification();
+    notification.title = "Notification title";
+    notification.icon = "emblem-default"; // see /usr/share/icons/gnome/16x16
+    notification.send("Notification message");
+
 ## References ##
 
 - [https://www.cloudkick.com/blog/2010/aug/23/writing-nodejs-native-extensions/]()
