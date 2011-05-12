@@ -1,8 +1,8 @@
-This tutorial is also available online here: [How to write your own native Node.js extension](http://syskall.com/)
+This tutorial is also available online here: [How to write your own native Node.js extension](http://syskall.com/how-to-write-your-own-native-nodejs-extension)
 
 ##Introduction##
 
-*This is a follow up to [How to roll out your own Javascript API with V8](http://syskall.com/how-to-roll-out-your-own-javascript-api-with). You should still be able to follow eventhough you haven't read it.*
+*This is a follow up to [How to roll out your own Javascript API with V8](http://syskall.com/how-to-roll-out-your-own-javascript-api-with). You should still be able to follow if you haven't read it.*
 
 We will now port the [code we have written for V8](https://github.com/olalonde/node-notify) to [Node.js](http://nodejs.org/) and package it for [npm](http://npmjs.org/).
 
@@ -32,7 +32,7 @@ First letâ€™s create a node-notify folder and with the following directory struc
 
 By the way, this fine looking tree was generated with the `tree` utility. 
 
-Now let's create our test script, demo.js, so that we know exactly what we want our extension to do.
+Now let's create our test script, `demo.js`, so that we know exactly what we want our extension to do.
 
     #!js
     // This loads our extension on the notify variable. 
@@ -50,7 +50,7 @@ Now let's create our test script, demo.js, so that we know exactly what we want 
 
 In order to create a Node.js extension, we need to write a C++ class that extends [node::ObjectWrap](https://github.com/joyent/node/blob/master/src/node_object_wrap.h). ObjectWrap implement some utility functions that lets us easily interface with Javascript. Let's write the skeletton for our class:
 
-    #!c++
+    #!cpp
     
     #include <v8.h> // v8 is the Javascript engine used by Node
     #include <node.h>
@@ -94,7 +94,7 @@ Now, we have to do the following in Init():
 
 1. Declare our constructor function and bind it on our target variable. `var notif = require("notification");` will bind `notif.notification()`.
 
-        #!c++
+        #!cpp
         
         // Wrap our C++ New() method so that it's accessible from Javascript
         // This will be called by the new operator in Javascript, for example: new notification();
@@ -113,7 +113,7 @@ Now, we have to do the following in Init():
 
 2. Declare attributes: `n.title` and `n.icon`.
   
-        #!c++    
+        #!cpp    
         
         // Set property accessors
         // SetAccessor arguments: Javascript property name, C++ method that will act as the getter, C++ method that will act as the setter
@@ -123,7 +123,7 @@ Now, we have to do the following in Init():
 
 3. Declare our prototype methods: `n.send()` 
     
-        #!c++
+        #!cpp
         
         // This is a Node macro to help bind C++ methods to Javascript methods (see https://github.com/joyent/node/blob/v0.2.0/src/node.h#L34)
         // Arguments: our constructor function, Javascript method name, C++ method name
@@ -131,7 +131,7 @@ Now, we have to do the following in Init():
 
 Our Init method should now look like this:
 
-        #!c++
+        #!cpp
         
         // Our constructor
         static v8::Persistent<FunctionTemplate> persistent_function_template;
@@ -163,7 +163,7 @@ All that we have left to do is write the C++ methods that we used in our Init me
 
 The New() method instantiate a C++ Gtknotify object, sets some default values for our properties and returns a Javascript handle to this object. This is the expected behavior when calling a constructor function with the new operator in Javascript.
 
-    #!c++
+    #!cpp
     
     std::string title;
     std::string icon; 
@@ -186,7 +186,7 @@ The New() method instantiate a C++ Gtknotify object, sets some default values fo
 
 The following is pretty much boilerplate code. All it does is pretty much back and forth conversion from C++ values to Javascript (V8) values.
     
-    #!c++
+    #!cpp
     
     // this.title
     static v8::Handle<Value> GetTitle(v8::Local<v8::String> property, const v8::AccessorInfo& info) {
@@ -218,7 +218,7 @@ The following is pretty much boilerplate code. All it does is pretty much back a
 
 First we extract the C++ object `this` references. Then we build our notification using our object's title and icon property and display it.
 
-    #!c++
+    #!cpp
     
     // this.send()
     static v8::Handle<Value> Send(const Arguments& args) {
@@ -349,7 +349,6 @@ Thanks for reading! Let me know in the comments if you run into any problem, Iâ€
 ##References##
 
 [How to roll out your own Javascript API with V8](http://syskall.com/how-to-roll-out-your-own-javascript-api-with)
-https://www.cloudkick.com/blog/2010/aug/23/writing-nodejs-native-extensions/
 
 [Writing Node.js Native Extensions](https://www.cloudkick.com/blog/2010/aug/23/writing-nodejs-native-extensions/)
 

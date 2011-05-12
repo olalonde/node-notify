@@ -1,4 +1,4 @@
-Tutorial available here: [How to write your own native Node.js extension](http://www.syskall.com) or in TUTORIAL.md
+Tutorial available here: [How to write your own native Node.js extension](http://syskall.com/how-to-write-your-own-native-nodejs-extension) or in TUTORIAL.md
 
 This is a follow up to [How to roll out your own Javascript API with V8](http://syskall.com/how-to-roll-out-your-own-javascript-api-with).
 
