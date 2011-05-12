@@ -1,6 +1,6 @@
-__THIS IS A WORK IN PROGRESS! THE TUTO WILL BE UP ON [HTTP://SYSKALL.COM](HTTP://SYSKALL.COM) WITHIN A FEW DAYS__
+Tutorial available here: [How to write your own native Node.js extension](http://www.syskall.com) or in TUTORIAL.md
 
-Part 1 (building a V8 extension) available here: [http://syskall.com/how-to-roll-out-your-own-javascript-api-with](http://syskall.com/how-to-roll-out-your-own-javascript-api-with)
+This is a follow up to [How to roll out your own Javascript API with V8](http://syskall.com/how-to-roll-out-your-own-javascript-api-with).
 
 ## Install ##
 
