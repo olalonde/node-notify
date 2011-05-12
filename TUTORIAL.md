@@ -30,9 +30,9 @@ First let’s create a node-notify folder and with the following directory struc
     |   `-- node_gtknotify.cpp   # This is the where we do the mapping from C++ to Javascript.
     `-- wscript                  # This is our build configuration used by node-waf
 
-By the way, this fine looking tree was generated with the `tree` utility. 
+*This fine looking tree was generated with the `tree` utility.*
 
-Now let's create our test script, `demo.js`, so that we know exactly what we want our extension to do.
+Now let's create our test script `demo.js` and decide upfront what our extension's API should look like:
 
     #!js
     // This loads our extension on the notify variable. 
@@ -46,9 +46,12 @@ Now let's create our test script, `demo.js`, so that we know exactly what we wan
 
 ##Writing our Node.js extension##
 
+
 ###The Init method###
 
-In order to create a Node.js extension, we need to write a C++ class that extends [node::ObjectWrap](https://github.com/joyent/node/blob/master/src/node_object_wrap.h). ObjectWrap implement some utility functions that lets us easily interface with Javascript. Let's write the skeletton for our class:
+In order to create a Node.js extension, we need to write a C++ class that extends [node::ObjectWrap](https://github.com/joyent/node/blob/master/src/node_object_wrap.h). ObjectWrap implements some utility methods that lets us easily interface with Javascript. 
+
+Let's write the skeletton for our class:
 
     #!cpp
     
@@ -90,9 +93,9 @@ In order to create a Node.js extension, we need to write a C++ class that extend
       NODE_MODULE(gtknotify, init);
     }
 
-Now, we have to do the following in Init():
+Now, we'll have to we have to write the following code in our Init() method:
 
-1. Declare our constructor function and bind it on our target variable. `var notif = require("notification");` will bind `notif.notification()`.
+1. Declare our constructor function and bind it to our target variable. `var n = require("notification");` will bind notification() to n: `n.notification()`.
 
         #!cpp
         
@@ -111,7 +114,7 @@ Now, we have to do the following in Init():
         // Set the "notification" property of our target variable and assign it to our constructor function
         target->Set(String::NewSymbol("notification"), Gtknotify::persistent_function_template->GetFunction());
 
-2. Declare attributes: `n.title` and `n.icon`.
+2. Declare our attributes: `n.title` and `n.icon`.
   
         #!cpp    
         
@@ -121,7 +124,7 @@ Now, we have to do the following in Init():
         Gtknotify::persistent_function_template->InstanceTemplate()->SetAccessor(String::New("icon"), GetIcon, SetIcon);
         // For instance, n.title = "foo" will now call SetTitle("foo"), n.title will now call GetTitle()
 
-3. Declare our prototype methods: `n.send()` 
+3. Declare our prototype method: `n.send()` 
     
         #!cpp
         
@@ -129,7 +132,7 @@ Now, we have to do the following in Init():
         // Arguments: our constructor function, Javascript method name, C++ method name
         NODE_SET_PROTOTYPE_METHOD(Gtknotify::persistent_function_template, "send", Send);
 
-Our Init method should now look like this:
+Our Init() method should now look like this:
 
         #!cpp
         
@@ -157,11 +160,11 @@ Our Init method should now look like this:
         }
 
 
-All that we have left to do is write the C++ methods that we used in our Init method: `New`, `GetTitle`, `SetTitle`, `GetIcon`, `SetIcon`, `Send` 
+All that is left to do is to write the C++ methods that we used in our Init method: `New`, `GetTitle`, `SetTitle`, `GetIcon`, `SetIcon`, `Send` 
 
 ###Our constructor method: New()###
 
-The New() method instantiate a C++ Gtknotify object, sets some default values for our properties and returns a Javascript handle to this object. This is the expected behavior when calling a constructor function with the new operator in Javascript.
+The New() method creates an instance of our class (a Gtknotify object), sets some default values to our properties and returns a Javascript handle to this object. This is the expected behavior when calling a constructor function with the new operator in Javascript.
 
     #!cpp
     
@@ -184,7 +187,7 @@ The New() method instantiate a C++ Gtknotify object, sets some default values fo
 
 ###Our getters and setters: GetTitle(), SetTitle(), GetIcon(), SetIcon()####
 
-The following is pretty much boilerplate code. All it does is pretty much back and forth conversion from C++ values to Javascript (V8) values.
+The following is pretty much boilerplate code. It boils down to back and forth conversion between C++ values to Javascript (V8) values.
     
     #!cpp
     
@@ -216,7 +219,7 @@ The following is pretty much boilerplate code. All it does is pretty much back a
 
 ###Our prototype method: Send()####
 
-First we extract the C++ object `this` references. Then we build our notification using our object's title and icon property and display it.
+First we have to extract the C++ object `this` references. We then build our notification using the object's properties (title, icon) and finally display it.
 
     #!cpp
     
@@ -241,7 +244,7 @@ First we extract the C++ object `this` references. Then we build our notificatio
     
 ##Compiling our extension##
 
-`node-waf` is the build tool used to compile Node extensions. It is mostly a wrapper to [waf](http://code.google.com/p/waf/). The build can be configured in a file called `wscript` in our top directory.
+`node-waf` is the build tool used to compile Node extensions which is basically a wrapper for [waf](http://code.google.com/p/waf/). The build process can be configured with a file called `wscript` in our top directory:
     
     #!python
     
@@ -263,14 +266,14 @@ First we extract the C++ object `this` references. Then we build our notificatio
       obj.source = "src/node_gtknotify.cpp"
       obj.uselib = ['LIBGTKMM', 'LIBNOTIFYMM']
 
-We're ready to build! In the top directory, execute the following command:
+We're now ready to build! In the top directory, run the following command:
 
     node-waf configure && node-waf build
 
-If everything goes right, we should now have our extension in `./build/default/gtknotify.node`. Let's try it!
+If everything goes right, we should now have our compiled extension in `./build/default/gtknotify.node`. Let's try it!
 
     #!bash
-
+    
     $ node
     > var notif = require('./build/default/gtknotify.node');
     > n = new notif.notification();
@@ -278,13 +281,13 @@ If everything goes right, we should now have our extension in `./build/default/g
     > n.send("Hello World!");
     true 
 
-This should display a notification in the top right corner of your screen!
+The previous code should display a notification in the top right corner of your screen!
 
 ##Packaging for npm##
 
-That's pretty cool, but how about sharing our hard work with the community? That's what the Node Package Manager mostly stands for: making easy to import modules and distribute them.
+That's pretty cool, but how about sharing your hard work with the Node community? That's primarily what the Node Package Manager is used for: making it easy to import extensions/modules and distribute them.
 
-Packaging an extension for npm is very straightforward. All you have to do is create a `package.json` file in your top directory with some info about your extension.
+Packaging an extension for npm is very straightforward. All you have to do is create a `package.json` file in your top directory which contains some info about your extension:
 
     #!javascript
     
@@ -324,11 +327,11 @@ Packaging an extension for npm is very straightforward. All you have to do is cr
         }
     }
 
-For more details on the package.json format, documentation is available through: `npm help json`. Note that most fields are optional.
+*For more details on the package.json format, documentation is available through `npm help json`. Note that most fields are optional.*
 
-You can install your new npm package by running `npm install` in your top directory. You should now be able to load your extension with a simple `var notify = require('your-package-name');`. Another useful command is `npm link` which will create a symlink to your development directory so that changes to your code are reflected instantly - no need to install/uninstall continually.
+You can now install your new npm package by running `npm install` in your top directory. If everything goes right, you should be able to load your extension with a simple `var notify = require('your-package-name');`. Another useful command is `npm link` which creates a symlink to your development directory so that any change to your code is reflected instantly - no need to install/uninstall perpetually.
 
-Now, assuming you wrote a cool extension, you might want to publish it online in the central npm repository. In order to do that, you first need to create an account:
+Assuming you wrote a cool extension, you might want to publish it online in the central npm repository. In order to do that, you first need to create an account:
 
     $ npm adduser
     
@@ -336,13 +339,13 @@ Next, go back to the root of your package code and run:
 
     $ npm publish
 
-That's it! Your package is now available for anyone to install: `npm install your-package-name`.
+That's it, your package is now available for anyone to install through the `npm install your-package-name` command.
 
 ##Conclusion##
 
-Writing a native Node extension can be a bit verbose at times but it is well worth the hard earned bragging rights. 
+Writing a native Node extension can be cumbersome and verbose at times but it is well worth the hard earned bragging rights!
 
-Thanks for reading! Let me know in the comments if you run into any problem, I’ll be glad to help. 
+Thanks for reading. Let me know in the comments if you run into any problem, I’ll be glad to help. 
 
 *If you liked this, maybe you'd also like what I [tweet on Twitter](http://twitter.com/olivierll)! Might even want to [hire me](mailto:olalonde@gmail.com)?*
 
