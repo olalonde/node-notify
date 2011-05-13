@@ -351,13 +351,8 @@ Thanks for reading. Let me know in the comments if you run into any problem, Iâ€
 
 ##References##
 
-[How to roll out your own Javascript API with V8](http://syskall.com/how-to-roll-out-your-own-javascript-api-with)
-
-[Writing Node.js Native Extensions](https://www.cloudkick.com/blog/2010/aug/23/writing-nodejs-native-extensions/)
-
-[V8 JavaScript Engine Embedder's Guid](http://code.google.com/apis/v8/embed.html)
-Part 1 (V8 extension) available here: [http://syskall.com/how-to-roll-out-your-own-javascript-api-with](http://syskall.com/how-to-roll-out-your-own-javascript-api-with)
-
-[Introduction to npm](http://howtonode.org/introduction-to-npm)
-
-[Node.js](http://nodejs.org/)
+- [How to roll out your own Javascript API with V8](http://syskall.com/how-to-roll-out-your-own-javascript-api-with)
+- [Writing Node.js Native Extensions](https://www.cloudkick.com/blog/2010/aug/23/writing-nodejs-native-extensions/)
+- [V8 JavaScript Engine Embedder's Guid](http://code.google.com/apis/v8/embed.html)
+- [Introduction to npm](http://howtonode.org/introduction-to-npm)
+- [Node.js](http://nodejs.org/)
