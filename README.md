@@ -2,7 +2,12 @@ Tutorial available here: [How to write your own native Node.js extension](http:/
 
 This is a follow up to [How to roll out your own Javascript API with V8](http://syskall.com/how-to-roll-out-your-own-javascript-api-with).
 
+
 ## Install ##
+
+Dependencies(Ubuntu 11.04):
+
+    sudo apt-get install libnotifymm-dev
 
 Using npm:
 
