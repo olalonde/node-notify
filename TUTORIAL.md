@@ -347,7 +347,7 @@ Writing a native Node extension can be cumbersome and verbose at times but it is
 
 Thanks for reading. Let me know in the comments if you run into any problem, I’ll be glad to help. 
 
-*If you liked this, maybe you'd also like what I [tweet on Twitter](http://twitter.com/olivierll)! Might even want to [hire me](mailto:olalonde@gmail.com)?*
+*If you liked this, maybe you'd also like what I [tweet on Twitter](http://twitter.com/o_lalonde)! Might even want to [hire me](mailto:olalonde@gmail.com)?*
 
 ##References##
 
