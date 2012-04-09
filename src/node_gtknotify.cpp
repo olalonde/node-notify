@@ -86,7 +86,7 @@ class Gtknotify : node::ObjectWrap {
       Gtknotify::persistent_function_template->InstanceTemplate()->SetAccessor(String::New("icon"), GetIcon, SetIcon);
       
       // @Node.js macro to help bind C++ methods to Javascript methods (see https://github.com/joyent/node/blob/v0.2.0/src/node.h#L34)
-      // Arguments: our constructor function, Javascript method na,e, C++ method name
+      // Arguments: our constructor function, Javascript method name, C++ method
       NODE_SET_PROTOTYPE_METHOD(Gtknotify::persistent_function_template, "send", Send);
       
       // Set the "notification" property to the target and assign it to our constructor function
