@@ -3,10 +3,10 @@
 //
 #include <v8.h>
 #include <node.h>
+#include <node_object_wrap.h>
 // We need those two libraries for the GTK+ notification 
 #include <string>
-#include <gtkmm.h>
-#include <libnotifymm.h>
+#include <libnotify/notify.h>
 
 /* 
 
@@ -46,6 +46,7 @@ using namespace v8;
 
 class Gtknotify : node::ObjectWrap {
   private:
+    NotifyNotification *n;
   public:
     Gtknotify() {}
     ~Gtknotify() {}
@@ -88,9 +89,11 @@ class Gtknotify : node::ObjectWrap {
       // @Node.js macro to help bind C++ methods to Javascript methods (see https://github.com/joyent/node/blob/v0.2.0/src/node.h#L34)
       // Arguments: our constructor function, Javascript method name, C++ method
       NODE_SET_PROTOTYPE_METHOD(Gtknotify::persistent_function_template, "send", Send);
+      NODE_SET_PROTOTYPE_METHOD(Gtknotify::persistent_function_template, "close", Close);
       
       // Set the "notification" property to the target and assign it to our constructor function
       target->Set(String::NewSymbol("notification"), Gtknotify::persistent_function_template->GetFunction());
+      notify_init("node-notify");
     }
 
     // new Notification();
@@ -101,6 +104,7 @@ class Gtknotify : node::ObjectWrap {
       // Set some default values
       gtknotify_instance->title = "Node.js";
       gtknotify_instance->icon = "terminal";
+      gtknotify_instance->n = notify_notification_new(gtknotify_instance->title.c_str(), "", gtknotify_instance->icon.c_str());
       
       // Wrap our C++ object as a Javascript object
       gtknotify_instance->Wrap(args.This());
@@ -115,20 +119,35 @@ class Gtknotify : node::ObjectWrap {
     // This is a method part of the constructor function's prototype
     static v8::Handle<Value> Send(const Arguments& args) {
       v8::HandleScope scope;
+      gint timeout = NOTIFY_EXPIRES_DEFAULT;
       // Extract C++ object reference from "this" aka args.This() argument
       Gtknotify* gtknotify_instance = node::ObjectWrap::Unwrap<Gtknotify>(args.This());
       
       // Convert first argument to V8 String
       v8::String::Utf8Value v8str(args[0]);
+      if(args.Length() > 1) {
+          if(!args[1]->IsNumber()) {
+              return v8::Undefined();
+          }
+          timeout = args[1]->ToUint32()->Value();
+      }
       
       // see http://library.gnome.org/devel/libnotify/0.7/NotifyNotification.html 
-      Notify::init("Basic");
       // Args: title, content, icon
-      Notify::Notification n(gtknotify_instance->title.c_str(), *v8str, gtknotify_instance->icon.c_str()); // *v8str points to the C string
       // Display notification
-      n.show();
+      notify_notification_update(gtknotify_instance->n, gtknotify_instance->title.c_str(), *v8str, gtknotify_instance->icon.c_str()); // *v8str points to the C string
+      notify_notification_set_timeout(gtknotify_instance->n, timeout);
+      notify_notification_show(gtknotify_instance->n, NULL);
+      // n.show();
       // Return value
       return v8::Boolean::New(true);
+    }
+
+    static v8::Handle<Value> Close(const Arguments& args) {
+      v8::HandleScope scope;
+      Gtknotify* gtknotify_instance = node::ObjectWrap::Unwrap<Gtknotify>(args.This());
+      notify_notification_close(gtknotify_instance->n, NULL);
+      return v8::Undefined();
     }
     
     // notification.title

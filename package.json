@@ -13,8 +13,8 @@
       , "url" : "https://github.com/olalonde/node-notify.git"
     }
   , "scripts" : {
-      "preinstall" : "node-waf configure && node-waf build"
+      "preinstall" : "node-gyp configure && node-gyp build"
       , "preuninstall" : "rm -rf build/*"
     }
-  , "main" : "build/default/gtknotify.node"
+  , "main" : "build/Release/gtknotify.node"
 }

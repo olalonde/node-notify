@@ -5,9 +5,9 @@ This is a follow up to [How to roll out your own Javascript API with V8](http://
 
 ## Install ##
 
-Dependencies(Ubuntu 11.04):
+Dependencies(Debian, Ubuntu):
 
-    sudo apt-get install libnotifymm-dev
+    sudo apt-get install libnotify-dev
 
 Using npm:
 
@@ -15,15 +15,23 @@ Using npm:
     
 Manually:
 
-    node-waf configure && node-waf build
+    node-gyp configure && node-gyp build
 
 ## Usage ##
 
-    var notify = require("notify"); // or "../build/default/gtknotify.node" if you build manually
+    var notify = require("notify"); // or "../build/Release/gtknotify.node" if you build manually
     var notification = new notify.notification();
     notification.title = "Notification title";
     notification.icon = "emblem-default"; // see /usr/share/icons/gnome/16x16
-    notification.send("Notification message");
+    notification.send("Notification message"); // using libnotify's default timeout
+
+To send notification with a timeout:
+
+    notification.send("Notification message", 3000); // 3 sec timeout
+    // or
+    notification.send("Notification message", 0); // lasts forever
+    notification.close(); // closes it
+
 
 ## References ##
 
